@@ -16,7 +16,9 @@ spec:
         tenantId: "your-tenant-id"
         keyvaultName: "your-keyvault-name"
         image:
-          repository: "your-registry"
+          repository: "mcr.microsoft.com"
+          imagename: "azure-cli"
+          tag: "latest"
         secrets:
           - name: userAssignedIdentityID
 
