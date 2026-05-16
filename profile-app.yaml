@@ -1,0 +1,85 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: profileservice  # This name will now be used as the default 'appname' for all resources
+  namespace: profiles
+spec:
+  components:
+    - name: profiles-rbac
+      type: carestack-rbac
+
+    - name: secrets-builder
+      type: secrets-builder
+      dependsOn:
+        - profiles-rbac
+      properties:
+        tenantId: "your-tenant-id"
+        keyvaultName: "your-keyvault-name"
+        image:
+          repository: "your-registry"
+        secrets:
+          - name: userAssignedIdentityID
+
+    - name: profile-api
+      type: carestack-service
+      dependsOn:
+        - secrets-builder
+      properties:
+        imagename: profileservice
+        tagVersion: "1.0.0"
+        image:
+          repository: "your-registry"
+        env:
+          CarestackEnvironment: "qa1"
+        envSecrets:
+          userAssignedIdentityID: userassignedidentityid
+      traits:
+        - type: ambassador-mapping
+          properties:
+            ambassador_id: "ambassador"
+            hostname: "profile.carestack.com"
+            mappings:
+              - prefix: /.*
+                precedence: 2000
+              - name: permissiondefinition-default
+                prefix: /api/permissiondefinition
+                precedence: 2001
+                bypass_auth: false
+
+    - name: post-deployment-job
+      type: post-job
+      dependsOn:
+        - profile-api
+      properties:
+        version: "1.0.0"
+        subscription: "your-subscription-id"
+        webappName: "your-webapp-name"
+        rgWebapp: "your-rg"
+        registryname: "your-registry"
+        imagename: profileserviceapp
+        env:
+          CarestackEnvironment: "qa1"
+        envSecrets:
+          userAssignedIdentityID: userassignedidentityid
+
+  workflow:
+    steps:
+      - name: apply-rbac
+        type: apply-component
+        properties:
+          component: profiles-rbac
+      
+      - name: build-secrets
+        type: apply-component
+        properties:
+          component: secrets-builder
+      
+      - name: deploy-services
+        type: apply-component
+        properties:
+          component: profile-api
+      
+      - name: run-post-job
+        type: apply-component
+        properties:
+          component: post-deployment-job
