@@ -1,8 +1,8 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
-  name: profileservice  # This name will now be used as the default 'appname' for all resources
-  namespace: profiles
+  name: testprofileservice  # This name will now be used as the default 'appname' for all resources
+  namespace: testprofiles
 spec:
   components:
     - name: profiles-rbac
