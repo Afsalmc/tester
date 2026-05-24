@@ -9,7 +9,7 @@ spec:
       type: carestack-rbac
 
     - name: secrets-builder
-      type: secrets-builder@v5.3.5
+      type: secrets-builder@v5.3.6
       dependsOn:
         - profiles-rbac
       properties:
