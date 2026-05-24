@@ -36,7 +36,7 @@ spec:
         envSecrets:
           userAssignedIdentityID: userassignedidentityid
       traits:
-        - type: ambassador-mapping@5.3.4
+        - type: ambassador-mapping@v5
           properties:
             ambassador_id: "ambassador"
             hostname: "profile.carestack.com"
